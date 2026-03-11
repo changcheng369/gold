@@ -1,0 +1,1271 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>双币赢续投编辑器 V6</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 28px;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            opacity: 0.9;
+        }
+
+        .main-content {
+            display: grid;
+            grid-template-columns: 350px 1fr;
+            gap: 0;
+            min-height: 600px;
+        }
+
+        .sidebar {
+            background: #f8f9fa;
+            border-right: 2px solid #e9ecef;
+            padding: 20px;
+            overflow-y: auto;
+            max-height: 700px;
+        }
+
+        .sidebar h2 {
+            font-size: 18px;
+            margin-bottom: 15px;
+            color: #333;
+        }
+
+        .filter-buttons {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 15px;
+            flex-wrap: wrap;
+        }
+
+        .filter-btn {
+            padding: 8px 16px;
+            border: 2px solid #667eea;
+            background: white;
+            color: #667eea;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 13px;
+            transition: all 0.3s;
+        }
+
+        .filter-btn:hover,
+        .filter-btn.active {
+            background: #667eea;
+            color: white;
+        }
+
+        .product-list {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .product-item {
+            background: white;
+            padding: 15px;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s;
+            border: 2px solid transparent;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .product-item:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        }
+
+        .product-item.selected {
+            border-color: #667eea;
+            background: #f0f3ff;
+        }
+
+        .product-id {
+            font-weight: bold;
+            color: #667eea;
+            margin-bottom: 5px;
+        }
+
+        .product-info {
+            font-size: 12px;
+            color: #666;
+            line-height: 1.8;
+        }
+
+        .detail-panel {
+            padding: 20px;
+            overflow-y: auto;
+            max-height: 700px;
+        }
+
+        .detail-panel h2 {
+            font-size: 20px;
+            margin-bottom: 20px;
+            color: #333;
+        }
+
+        .info-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 15px;
+            margin-bottom: 20px;
+        }
+
+        .info-card .label {
+            opacity: 0.9;
+            font-size: 14px;
+            margin-bottom: 5px;
+        }
+
+        .info-card .value {
+            font-size: 24px;
+            font-weight: bold;
+            margin-bottom: 15px;
+        }
+
+        .info-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px;
+            margin-top: 15px;
+        }
+
+        .info-item {
+            background: rgba(255,255,255,0.2);
+            padding: 12px;
+            border-radius: 10px;
+        }
+
+        .info-item .item-label {
+            font-size: 12px;
+            opacity: 0.8;
+            margin-bottom: 5px;
+        }
+
+        .info-item .item-value {
+            font-size: 18px;
+            font-weight: bold;
+        }
+
+        .history-section {
+            margin-bottom: 20px;
+        }
+
+        .history-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .history-header h3 {
+            font-size: 16px;
+            color: #333;
+        }
+
+        .history-table {
+            width: 100%;
+            border-collapse: collapse;
+            background: white;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        .history-table th,
+        .history-table td {
+            padding: 12px 10px;
+            text-align: left;
+            border-bottom: 1px solid #e9ecef;
+            font-size: 13px;
+        }
+
+        .history-table th {
+            background: #f8f9fa;
+            font-weight: 600;
+            color: #495057;
+        }
+
+        .history-table tr:hover {
+            background: #f8f9fa;
+        }
+
+        .action-btn {
+            padding: 6px 12px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 12px;
+            transition: all 0.3s;
+            margin-right: 5px;
+        }
+
+        .edit-btn {
+            background: #ffc107;
+            color: #333;
+        }
+
+        .edit-btn:hover {
+            background: #e0a800;
+        }
+
+        .delete-btn {
+            background: #dc3545;
+            color: white;
+        }
+
+        .delete-btn:hover {
+            background: #c82333;
+        }
+
+        .trigger-btn {
+            padding: 6px 12px;
+            border: 2px solid;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 12px;
+            transition: all 0.3s;
+            background: white;
+        }
+
+        .trigger-btn.not-triggered {
+            border-color: #28a745;
+            color: #28a745;
+        }
+
+        .trigger-btn.not-triggered:hover {
+            background: #28a745;
+            color: white;
+        }
+
+        .trigger-btn.triggered {
+            border-color: #dc3545;
+            color: #dc3545;
+        }
+
+        .trigger-btn.triggered:hover {
+            background: #dc3545;
+            color: white;
+        }
+
+        .add-form {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 12px;
+            margin-bottom: 20px;
+        }
+
+        .add-form h3 {
+            font-size: 16px;
+            margin-bottom: 15px;
+            color: #333;
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .form-group label {
+            font-size: 13px;
+            color: #666;
+            margin-bottom: 5px;
+        }
+
+        .form-group input,
+        .form-group select {
+            padding: 10px;
+            border: 2px solid #e9ecef;
+            border-radius: 8px;
+            font-size: 14px;
+            transition: all 0.3s;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .form-buttons {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(102,126,234,0.4);
+        }
+
+        .btn-secondary {
+            background: #6c757d;
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.3s;
+        }
+
+        .btn-secondary:hover {
+            background: #5a6268;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+        }
+
+        .modal.active {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal-content {
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            width: 90%;
+            max-width: 600px;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .modal-header h3 {
+            font-size: 20px;
+            color: #333;
+        }
+
+        .close-btn {
+            background: none;
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+            color: #999;
+        }
+
+        .close-btn:hover {
+            color: #333;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: #999;
+        }
+
+        .empty-state .icon {
+            font-size: 48px;
+            margin-bottom: 15px;
+        }
+
+        .empty-state p {
+            font-size: 16px;
+        }
+
+        .overview-btn {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            font-size: 28px;
+            cursor: pointer;
+            box-shadow: 0 4px 15px rgba(102,126,234,0.5);
+            transition: all 0.3s;
+            z-index: 100;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .overview-btn:hover {
+            transform: scale(1.1);
+            box-shadow: 0 6px 20px rgba(102,126,234,0.6);
+        }
+
+        .overview-modal-content {
+            max-width: 1000px;
+        }
+
+        .overview-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .stat-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 12px;
+            text-align: center;
+        }
+
+        .stat-card.eth {
+            background: linear-gradient(135deg, #627eea 0%, #8291eb 100%);
+        }
+
+        .stat-card.btc {
+            background: linear-gradient(135deg, #f7931a 0%, #ffb347 100%);
+        }
+
+        .stat-card.bnb {
+            background: linear-gradient(135deg, #f3ba2f 0%, #f6d365 100%);
+        }
+
+        .stat-card h4 {
+            font-size: 14px;
+            opacity: 0.9;
+            margin-bottom: 10px;
+        }
+
+        .stat-card .stat-value {
+            font-size: 24px;
+            font-weight: bold;
+        }
+
+        .overview-table {
+            width: 100%;
+            border-collapse: collapse;
+            background: white;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+
+        .overview-table th,
+        .overview-table td {
+            padding: 12px 10px;
+            text-align: left;
+            border-bottom: 1px solid #e9ecef;
+            font-size: 13px;
+        }
+
+        .overview-table th {
+            background: #f8f9fa;
+            font-weight: 600;
+            color: #495057;
+        }
+
+        .overview-table tr:hover {
+            background: #f8f9fa;
+        }
+
+        .coin-badge {
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: bold;
+            color: white;
+        }
+
+        .coin-badge.ETH {
+            background: #627eea;
+        }
+
+        .coin-badge.BTC {
+            background: #f7931a;
+        }
+
+        .coin-badge.BNB {
+            background: #f3ba2f;
+        }
+
+        .status-active {
+            color: #28a745;
+            font-weight: bold;
+        }
+
+        .status-inactive {
+            color: #6c757d;
+        }
+
+        @media (max-width: 768px) {
+            .main-content {
+                grid-template-columns: 1fr;
+            }
+
+            .sidebar {
+                max-height: 300px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🎯 双币赢续投编辑器 V6</h1>
+            <p>手动标记触发状态 | 历史记录可编辑 | 自动计算收益率 | 数据自动保存</p>
+        </div>
+
+        <div class="main-content">
+            <div class="sidebar">
+                <h2>📋 产品列表</h2>
+                <div class="filter-buttons">
+                    <button class="filter-btn active" onclick="filterProducts('all')">全部</button>
+                    <button class="filter-btn" onclick="filterProducts('ETH')">ETH</button>
+                    <button class="filter-btn" onclick="filterProducts('BTC')">BTC</button>
+                    <button class="filter-btn" onclick="filterProducts('BNB')">BNB</button>
+                </div>
+                <div class="product-list" id="productList"></div>
+            </div>
+
+            <div class="detail-panel" id="detailPanel">
+                <div class="empty-state">
+                    <div class="icon">👈</div>
+                    <p>请从左侧选择一个产品</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal" id="editModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>✏️ 编辑周期记录</h3>
+                <button class="close-btn" onclick="closeEditModal()">&times;</button>
+            </div>
+            <div id="editFormContainer"></div>
+        </div>
+    </div>
+
+    <div class="modal" id="overviewModal">
+        <div class="modal-content overview-modal-content">
+            <div class="modal-header">
+                <h3>📊 投资总览</h3>
+                <button class="close-btn" onclick="closeOverviewModal()">&times;</button>
+            </div>
+            <div id="overviewContainer"></div>
+        </div>
+    </div>
+
+    <button class="overview-btn" onclick="showOverview()" title="查看总览">📊</button>
+
+    <script>
+        function getDefaultData() {
+            return {
+                "ETH-001": { coin: "ETH", targetPrice: 1900, initialAmount: 6000, cycles: [], totalCycles: 0, totalProfit: 0 },
+                "ETH-002": { coin: "ETH", targetPrice: 1800, initialAmount: 6000, cycles: [], totalCycles: 0, totalProfit: 0 },
+                "ETH-003": { coin: "ETH", targetPrice: 1700, initialAmount: 6000, cycles: [], totalCycles: 0, totalProfit: 0 },
+                "ETH-004": { coin: "ETH", targetPrice: 1600, initialAmount: 6000, cycles: [], totalCycles: 0, totalProfit: 0 },
+                "ETH-005": { coin: "ETH", targetPrice: 1500, initialAmount: 6000, cycles: [], totalCycles: 0, totalProfit: 0 },
+                "BTC-001": { coin: "BTC", targetPrice: 62000, initialAmount: 10000, cycles: [], totalCycles: 0, totalProfit: 0 },
+                "BTC-002": { coin: "BTC", targetPrice: 59500, initialAmount: 10000, cycles: [], totalCycles: 0, totalProfit: 0 },
+                "BTC-003": { coin: "BTC", targetPrice: 57000, initialAmount: 10000, cycles: [], totalCycles: 0, totalProfit: 0 },
+                "BTC-004": { coin: "BTC", targetPrice: 54500, initialAmount: 10000, cycles: [], totalCycles: 0, totalProfit: 0 },
+                "BTC-005": { coin: "BTC", targetPrice: 52000, initialAmount: 10000, cycles: [], totalCycles: 0, totalProfit: 0 },
+                "BNB-001": { coin: "BNB", targetPrice: 550, initialAmount: 4000, cycles: [], totalCycles: 0, totalProfit: 0 },
+                "BNB-002": { coin: "BNB", targetPrice: 520, initialAmount: 4000, cycles: [], totalCycles: 0, totalProfit: 0 },
+                "BNB-003": { coin: "BNB", targetPrice: 490, initialAmount: 4000, cycles: [], totalCycles: 0, totalProfit: 0 },
+                "BNB-004": { coin: "BNB", targetPrice: 460, initialAmount: 4000, cycles: [], totalCycles: 0, totalProfit: 0 },
+                "BNB-005": { coin: "BNB", targetPrice: 430, initialAmount: 4000, cycles: [], totalCycles: 0, totalProfit: 0 }
+            };
+        }
+
+        let data = getDefaultData();
+        let selectedProduct = null;
+        let editingCycle = null;
+        let editingProduct = null;
+        let currentFilter = 'all';
+
+        function renderProductList() {
+            const list = document.getElementById('productList');
+            list.innerHTML = '';
+            Object.entries(data).forEach(([id, product]) => {
+                if (currentFilter !== 'all' && product.coin !== currentFilter) return;
+                const item = document.createElement('div');
+                item.className = `product-item ${selectedProduct === id ? 'selected' : ''}`;
+                item.onclick = () => selectProduct(id);
+                item.innerHTML = `
+                    <div class="product-id">${id}</div>
+                    <div class="product-info">
+                        <div>目标价: ${formatPrice(product.targetPrice)} ${product.coin}</div>
+                        <div>初始投入: $${product.initialAmount.toLocaleString()}</div>
+                        <div>总收益: $${product.totalProfit.toFixed(2)}</div>
+                        <div>已完成: ${product.totalCycles} 个周期</div>
+                    </div>
+                `;
+                list.appendChild(item);
+            });
+        }
+
+        function selectProduct(id) {
+            selectedProduct = id;
+            renderProductList();
+            renderDetailPanel();
+        }
+
+        function renderDetailPanel() {
+            const panel = document.getElementById('detailPanel');
+            if (!selectedProduct) {
+                panel.innerHTML = '<div class="empty-state"><div class="icon">👈</div><p>请从左侧选择一个产品</p></div>';
+                return;
+            }
+            const product = data[selectedProduct];
+            panel.innerHTML = `
+                <h2>${selectedProduct} - ${product.coin} 双币赢</h2>
+                <div class="info-card">
+                    <div class="label">目标价格</div>
+                    <div class="value">$${product.targetPrice.toLocaleString()} ${product.coin}</div>
+                    <div class="info-grid">
+                        <div class="info-item"><div class="item-label">初始投入</div><div class="item-value">$${product.initialAmount.toLocaleString()}</div></div>
+                        <div class="info-item"><div class="item-label">总收益</div><div class="item-value">$${product.totalProfit.toFixed(2)}</div></div>
+                        <div class="info-item"><div class="item-label">总收益率</div><div class="item-value">${product.initialAmount > 0 ? ((product.totalProfit / product.initialAmount) * 100).toFixed(2) : 0}%</div></div>
+                        <div class="info-item"><div class="item-label">已完成周期</div><div class="item-value">${product.totalCycles}</div></div>
+                    </div>
+                </div>
+                <div class="history-section">
+                    <div class="history-header"><h3>📜 历史周期记录</h3></div>
+                    ${product.cycles.length === 0 ? '<div class="empty-state"><div class="icon">📭</div><p>暂无历史记录</p></div>' : `
+                        <table class="history-table">
+                            <thead>
+                                <tr><th>周期</th><th>投资日期</th><th>到期日期</th><th>触发状态</th><th>绝对收益率</th><th>年化收益率</th><th>结果</th><th>操作</th></tr>
+                            </thead>
+                            <tbody>
+                                ${product.cycles.slice().reverse().map(cycle => {
+                                    const days = calculateDays(cycle.investDate, cycle.maturityDate);
+                                    const annualRate = cycle.profitRate > 0 ? calculateAnnualRate(cycle.profitRate, days) : 0;
+                                    return `
+                                    <tr>
+                                        <td><strong>${cycle.cycleNumber}</strong></td>
+                                        <td>${cycle.investDate}</td>
+                                        <td>${cycle.maturityDate}</td>
+                                        <td>
+                                            <button class="trigger-btn ${cycle.triggered ? 'triggered' : 'not-triggered'}" onclick="toggleTrigger('${selectedProduct}', ${cycle.cycleNumber})">
+                                                ${cycle.triggered ? '已触发 ✅' : '未触发'}
+                                            </button>
+                                        </td>
+                                        <td style="color: ${cycle.profitRate >= 0 ? '#28a745' : '#dc3545'}; font-weight: bold;">
+                                            ${cycle.triggered ? '-' : cycle.profitRate.toFixed(2) + '%'}
+                                        </td>
+                                        <td style="color: ${annualRate >= 0 ? '#28a745' : '#dc3545'}; font-weight: bold;">
+                                            ${cycle.triggered ? '-' : annualRate.toFixed(2) + '%'}
+                                        </td>
+                                        <td>
+                                            ${cycle.triggered ? `
+                                                <span style="color: #dc3545;">
+                                                    买入 ${cycle.coinPurchased || 0} ${product.coin}<br>
+                                                    @ $${cycle.purchasePrice || product.targetPrice}
+                                                </span>
+                                            ` : `
+                                                <span style="color: #28a745;">
+                                                    +$${cycle.profit.toFixed(2)}<br>
+                                                    (${cycle.profitRate.toFixed(2)}% | ${days}天)
+                                                </span>
+                                            `}
+                                        </td>
+                                        <td>
+                                            <button class="action-btn edit-btn" onclick="openEditModal('${selectedProduct}', ${cycle.cycleNumber})">编辑</button>
+                                            <button class="action-btn delete-btn" onclick="deleteCycle('${selectedProduct}', ${cycle.cycleNumber})">删除</button>
+                                        </td>
+                                    </tr>
+                                `;}).join('')}
+                            </tbody>
+                        </table>
+                    `}
+                </div>
+                <div class="add-form">
+                    <h3>➕ 添加新周期</h3>
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label>投入金额 (USDT)</label>
+                            <input type="number" id="investAmount" placeholder="输入投入金额">
+                        </div>
+                        <div class="form-group">
+                            <label>投资日期</label>
+                            <input type="date" id="investDate">
+                        </div>
+                        <div class="form-group">
+                            <label>到期日期</label>
+                            <input type="date" id="maturityDate">
+                        </div>
+                        <div class="form-group">
+                            <label>到期收益/续投金额 (USDT)</label>
+                            <input type="number" id="renewAmount" placeholder="输入续投金额">
+                        </div>
+                        <div class="form-group">
+                            <label>是否触发目标价？</label>
+                            <select id="isTriggered">
+                                <option value="false">否 - 拿回USDT</option>
+                                <option value="true">是 - 买入${product.coin}</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-buttons">
+                        <button class="btn-primary" onclick="addCycle()">✓ 添加周期</button>
+                        <button class="btn-secondary" onclick="autoFill()">⚡ 自动填充</button>
+                        <button class="btn-secondary" style="background: #17a2b8;" onclick="exportData()">📥 导出数据</button>
+                        <button class="btn-secondary" style="background: #ffc107;" onclick="importData()">📤 导入数据</button>
+                        <button class="btn-secondary" style="background: #dc3545;" onclick="clearAllData()">🗑️ 清空数据</button>
+                    </div>
+                </div>
+            `;
+        }
+
+        function toggleTrigger(productId, cycleNumber) {
+            const product = data[productId];
+            const cycle = product.cycles.find(c => c.cycleNumber === cycleNumber);
+            if (cycle) {
+                cycle.triggered = !cycle.triggered;
+                if (cycle.triggered) {
+                    const amount = prompt(`请输入购买 ${product.coin} 数量:`);
+                    if (amount !== null) {
+                        cycle.coinPurchased = parseFloat(amount);
+                        cycle.purchasePrice = product.targetPrice;
+                        cycle.renewAmount = 0;
+                        cycle.profit = 0;
+                        cycle.profitRate = 0;
+                    } else {
+                        cycle.triggered = false;
+                        return;
+                    }
+                } else {
+                    const renewAmount = prompt('请输入续投金额 (本金+收益):');
+                    if (renewAmount !== null) {
+                        cycle.renewAmount = parseFloat(renewAmount);
+                        cycle.profit = cycle.renewAmount - cycle.investAmount;
+                        cycle.profitRate = (cycle.profit / cycle.investAmount) * 100;
+                        cycle.coinPurchased = 0;
+                        cycle.purchasePrice = 0;
+                    } else {
+                        cycle.triggered = true;
+                        return;
+                    }
+                }
+                recalculateTotal(productId);
+                renderDetailPanel();
+            }
+        }
+
+        function addCycle() {
+            const investAmount = parseFloat(document.getElementById('investAmount').value);
+            const investDate = document.getElementById('investDate').value;
+            const maturityDate = document.getElementById('maturityDate').value;
+            const renewAmount = parseFloat(document.getElementById('renewAmount').value);
+            const isTriggered = document.getElementById('isTriggered').value === 'true';
+
+            if (!investAmount || !investDate || !maturityDate) {
+                alert('请填写完整信息');
+                return;
+            }
+
+            if (!isTriggered && isNaN(renewAmount)) {
+                alert('请输入续投金额');
+                return;
+            }
+
+            const product = data[selectedProduct];
+            const newCycleNumber = product.totalCycles + 1;
+            const newCycle = {
+                cycleNumber: newCycleNumber,
+                investAmount: investAmount,
+                investDate: investDate,
+                maturityDate: maturityDate,
+                triggered: isTriggered,
+                renewAmount: isTriggered ? 0 : renewAmount,
+                profit: 0,
+                profitRate: 0,
+                coinPurchased: 0,
+                purchasePrice: 0
+            };
+
+            if (isTriggered) {
+                const amount = prompt(`请输入购买 ${product.coin} 数量:`);
+                if (amount) {
+                    newCycle.coinPurchased = parseFloat(amount);
+                    newCycle.purchasePrice = product.targetPrice;
+                    newCycle.profit = 0;
+                    newCycle.profitRate = 0;
+                } else {
+                    alert('请输入购买数量');
+                    return;
+                }
+            } else {
+                newCycle.profit = newCycle.renewAmount - newCycle.investAmount;
+                newCycle.profitRate = (newCycle.profit / newCycle.investAmount) * 100;
+            }
+
+            product.cycles.push(newCycle);
+            product.totalCycles++;
+            recalculateTotal(selectedProduct);
+            saveData();
+            renderDetailPanel();
+
+            document.getElementById('investAmount').value = '';
+            document.getElementById('renewAmount').value = '';
+            document.getElementById('investDate').value = '';
+            document.getElementById('maturityDate').value = '';
+        }
+
+        function calculateDays(startDate, endDate) {
+            const start = new Date(startDate);
+            const end = new Date(endDate);
+            const diffTime = end - start;
+            const diffDays = diffTime / (1000 * 60 * 60 * 24);
+            return Math.round(diffDays);
+        }
+
+        function calculateAnnualRate(profitRate, days) {
+            if (days <= 0 || profitRate <= 0) return 0;
+            const annualRate = Math.pow(1 + profitRate / 100, 365 / days) - 1;
+            return annualRate * 100;
+        }
+
+        function autoFill() {
+            const product = data[selectedProduct];
+            if (product.cycles.length > 0) {
+                const lastCycle = product.cycles[product.cycles.length - 1];
+                document.getElementById('investAmount').value = lastCycle.renewAmount;
+                document.getElementById('investDate').value = lastCycle.maturityDate;
+            } else {
+                document.getElementById('investAmount').value = product.initialAmount;
+                const today = new Date();
+                document.getElementById('investDate').value = today.toISOString().split('T')[0];
+            }
+
+            const investDate = new Date(document.getElementById('investDate').value);
+            const nextWeek = new Date(investDate);
+            nextWeek.setDate(nextWeek.getDate() + 7);
+            document.getElementById('maturityDate').value = nextWeek.toISOString().split('T')[0];
+        }
+
+        function deleteCycle(productId, cycleNumber) {
+            if (confirm('确定要删除这个周期记录吗？')) {
+                const product = data[productId];
+                product.cycles = product.cycles.filter(c => c.cycleNumber !== cycleNumber);
+                product.totalCycles--;
+                recalculateTotal(productId);
+                saveData();
+                renderDetailPanel();
+            }
+        }
+
+        function openEditModal(productId, cycleNumber) {
+            editingProduct = productId;
+            editingCycle = cycleNumber;
+            const product = data[productId];
+            const cycle = product.cycles.find(c => c.cycleNumber === cycleNumber);
+
+            const days = calculateDays(cycle.investDate, cycle.maturityDate);
+            const annualRate = cycle.profitRate > 0 ? calculateAnnualRate(cycle.profitRate, days) : 0;
+
+            document.getElementById('editFormContainer').innerHTML = `
+                <div class="form-grid">
+                    <div class="form-group"><label>周期编号</label><input type="number" id="editCycleNumber" value="${cycle.cycleNumber}" readonly></div>
+                    <div class="form-group"><label>投入金额 (USDT)</label><input type="number" id="editInvestAmount" value="${cycle.investAmount}"></div>
+                    <div class="form-group"><label>投资日期</label><input type="date" id="editInvestDate" value="${cycle.investDate}"></div>
+                    <div class="form-group"><label>到期日期</label><input type="date" id="editMaturityDate" value="${cycle.maturityDate}"></div>
+                    <div class="form-group"><label>触发状态</label><select id="editIsTriggered"><option value="false" ${!cycle.triggered ? 'selected' : ''}>否 - 拿回USDT</option><option value="true" ${cycle.triggered ? 'selected' : ''}>是 - 买入${product.coin}</option></select></div>
+                </div>
+                <div class="form-grid">
+                    <div class="form-group"><label>续投金额 (未触发)</label><input type="number" id="editRenewAmount" value="${cycle.renewAmount}" ${cycle.triggered ? 'disabled' : ''}></div>
+                    <div class="form-group"><label>收益 (未触发)</label><input type="number" id="editProfit" value="${cycle.profit}" ${cycle.triggered ? 'disabled' : ''}></div>
+                    <div class="form-group"><label>绝对收益率 (未触发, %)</label><input type="number" id="editProfitRate" value="${cycle.profitRate.toFixed(2)}" ${cycle.triggered ? 'disabled' : ''} step="0.01"></div>
+                </div>
+                <div class="form-grid" style="margin-top: 15px; padding: 15px; background: #f0f3ff; border-radius: 8px;">
+                    <div class="form-group"><label style="color: #667eea; font-weight: bold;">投资天数</label><input type="text" id="editDays" value="${days}" readonly style="background: #e9ecef;"></div>
+                    <div class="form-group"><label style="color: #667eea; font-weight: bold;">年化收益率</label><input type="text" id="editAnnualRate" value="${annualRate.toFixed(2)}%" readonly style="background: #e9ecef; color: #28a745; font-weight: bold;"></div>
+                </div>
+                <div class="form-grid" style="margin-top: 15px;">
+                    <div class="form-group"><label>购买 ${product.coin} 数量 (触发)</label><input type="number" id="editCoinPurchased" value="${cycle.coinPurchased || 0}" ${!cycle.triggered ? 'disabled' : ''}></div>
+                    <div class="form-group"><label>购买价格 (触发)</label><input type="number" id="editPurchasePrice" value="${cycle.purchasePrice || 0}" ${!cycle.triggered ? 'disabled' : ''}></div>
+                </div>
+                <div class="form-buttons" style="margin-top: 20px;">
+                    <button class="btn-primary" onclick="saveEdit()">✓ 保存修改</button>
+                    <button class="btn-secondary" onclick="closeEditModal()">取消</button>
+                </div>
+            `;
+
+            document.getElementById('editIsTriggered').addEventListener('change', function() {
+                const isTriggered = this.value === 'true';
+                document.getElementById('editRenewAmount').disabled = isTriggered;
+                document.getElementById('editProfit').disabled = isTriggered;
+                document.getElementById('editProfitRate').disabled = isTriggered;
+                document.getElementById('editCoinPurchased').disabled = !isTriggered;
+                document.getElementById('editPurchasePrice').disabled = !isTriggered;
+            });
+
+            document.getElementById('editModal').classList.add('active');
+        }
+
+        function closeEditModal() {
+            document.getElementById('editModal').classList.remove('active');
+            editingProduct = null;
+            editingCycle = null;
+        }
+
+        function saveEdit() {
+            const product = data[editingProduct];
+            const cycle = product.cycles.find(c => c.cycleNumber === editingCycle);
+
+            cycle.investAmount = parseFloat(document.getElementById('editInvestAmount').value);
+            cycle.investDate = document.getElementById('editInvestDate').value;
+            cycle.maturityDate = document.getElementById('editMaturityDate').value;
+            cycle.triggered = document.getElementById('editIsTriggered').value === 'true';
+
+            if (cycle.triggered) {
+                cycle.coinPurchased = parseFloat(document.getElementById('editCoinPurchased').value);
+                cycle.purchasePrice = parseFloat(document.getElementById('editPurchasePrice').value);
+                cycle.renewAmount = 0;
+                cycle.profit = 0;
+                cycle.profitRate = 0;
+            } else {
+                cycle.renewAmount = parseFloat(document.getElementById('editRenewAmount').value);
+                cycle.profit = parseFloat(document.getElementById('editProfit').value);
+                cycle.profitRate = parseFloat(document.getElementById('editProfitRate').value);
+
+                if (cycle.renewAmount > 0 && !isNaN(cycle.profitRate)) {
+                    cycle.profit = cycle.investAmount * (cycle.profitRate / 100);
+                } else if (cycle.renewAmount > 0) {
+                    cycle.profit = cycle.renewAmount - cycle.investAmount;
+                    cycle.profitRate = (cycle.profit / cycle.investAmount) * 100;
+                }
+
+                cycle.coinPurchased = 0;
+                cycle.purchasePrice = 0;
+            }
+
+            recalculateTotal(editingProduct);
+            saveData();
+            renderDetailPanel();
+            closeEditModal();
+        }
+
+        function recalculateTotal(productId) {
+            const product = data[productId];
+            product.totalProfit = product.cycles.reduce((sum, cycle) => {
+                if (!cycle.triggered) {
+                    return sum + cycle.profit;
+                } else {
+                    return sum;
+                }
+            }, 0);
+        }
+
+        function filterProducts(filter) {
+            currentFilter = filter;
+            document.querySelectorAll('.filter-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            event.target.classList.add('active');
+            renderProductList();
+        }
+
+        function formatPrice(price) {
+            if (price >= 1000) {
+                return price.toLocaleString();
+            } else {
+                return price.toFixed(2);
+            }
+        }
+
+        function saveData() {
+            localStorage.setItem('dualCurrencyData', JSON.stringify(data));
+        }
+
+        function loadData() {
+            const saved = localStorage.getItem('dualCurrencyData');
+            if (saved) {
+                try {
+                    const parsed = JSON.parse(saved);
+                    return parsed;
+                } catch (e) {
+                    return getDefaultData();
+                }
+            }
+            return getDefaultData();
+        }
+
+        function exportData() {
+            const dataStr = JSON.stringify(data, null, 2);
+            const blob = new Blob([dataStr], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `双币赢数据_${new Date().toISOString().slice(0,10)}.json`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+            alert('数据导出成功！');
+        }
+
+        function importData() {
+            const input = document.createElement('input');
+            input.type = 'file';
+            input.accept = '.json';
+            input.onchange = (e) => {
+                const file = e.target.files[0];
+                const reader = new FileReader();
+                reader.onload = (event) => {
+                    try {
+                        const importedData = JSON.parse(event.target.result);
+                        if (confirm('导入数据将覆盖现有数据，确定要继续吗？')) {
+                            data = importedData;
+                            saveData();
+                            renderProductList();
+                            if (selectedProduct) {
+                                renderDetailPanel();
+                            }
+                            alert('数据导入成功！');
+                        }
+                    } catch (error) {
+                        alert('导入失败：文件格式不正确');
+                    }
+                };
+                reader.readAsText(file);
+            };
+            input.click();
+        }
+
+        function clearAllData() {
+            if (confirm('确定要清空所有周期数据吗？此操作不可恢复！')) {
+                Object.keys(data).forEach(key => {
+                    data[key].cycles = [];
+                    data[key].totalCycles = 0;
+                    data[key].totalProfit = 0;
+                });
+                saveData();
+                renderProductList();
+                if (selectedProduct) {
+                    renderDetailPanel();
+                }
+                alert('数据已清空！');
+            }
+        }
+
+        function showOverview() {
+            const overviewContainer = document.getElementById('overviewContainer');
+
+            const totalInitial = Object.values(data).reduce((sum, p) => sum + p.initialAmount, 0);
+            const totalProfit = Object.values(data).reduce((sum, p) => sum + p.totalProfit, 0);
+            const totalCycles = Object.values(data).reduce((sum, p) => sum + p.totalCycles, 0);
+            const totalReturnRate = totalInitial > 0 ? ((totalProfit / totalInitial) * 100).toFixed(2) : 0;
+
+            const ethData = Object.values(data).filter(p => p.coin === 'ETH');
+            const btcData = Object.values(data).filter(p => p.coin === 'BTC');
+            const bnbData = Object.values(data).filter(p => p.coin === 'BNB');
+
+            const ethInitial = ethData.reduce((sum, p) => sum + p.initialAmount, 0);
+            const ethProfit = ethData.reduce((sum, p) => sum + p.totalProfit, 0);
+            const ethCycles = ethData.reduce((sum, p) => sum + p.totalCycles, 0);
+            const ethReturnRate = ethInitial > 0 ? ((ethProfit / ethInitial) * 100).toFixed(2) : 0;
+
+            const btcInitial = btcData.reduce((sum, p) => sum + p.initialAmount, 0);
+            const btcProfit = btcData.reduce((sum, p) => sum + p.totalProfit, 0);
+            const btcCycles = btcData.reduce((sum, p) => sum + p.totalCycles, 0);
+            const btcReturnRate = btcInitial > 0 ? ((btcProfit / btcInitial) * 100).toFixed(2) : 0;
+
+            const bnbInitial = bnbData.reduce((sum, p) => sum + p.initialAmount, 0);
+            const bnbProfit = bnbData.reduce((sum, p) => sum + p.totalProfit, 0);
+            const bnbCycles = bnbData.reduce((sum, p) => sum + p.totalCycles, 0);
+            const bnbReturnRate = bnbInitial > 0 ? ((bnbProfit / bnbInitial) * 100).toFixed(2) : 0;
+
+            overviewContainer.innerHTML = `
+                <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 25px; border-radius: 12px; margin-bottom: 30px; text-align: center;">
+                    <h3 style="margin: 0 0 15px 0; font-size: 18px;">🎯 所有策略总和</h3>
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 20px;">
+                        <div>
+                            <div style="font-size: 14px; opacity: 0.9; margin-bottom: 5px;">总投入</div>
+                            <div style="font-size: 28px; font-weight: bold;">$${totalInitial.toLocaleString()}</div>
+                        </div>
+                        <div>
+                            <div style="font-size: 14px; opacity: 0.9; margin-bottom: 5px;">总收益</div>
+                            <div style="font-size: 28px; font-weight: bold; color: ${totalProfit >= 0 ? '#a8ff78' : '#ff6b6b'}">$${totalProfit.toFixed(2)}</div>
+                        </div>
+                        <div>
+                            <div style="font-size: 14px; opacity: 0.9; margin-bottom: 5px;">总收益率</div>
+                            <div style="font-size: 28px; font-weight: bold; color: ${totalReturnRate >= 0 ? '#a8ff78' : '#ff6b6b'}">${totalReturnRate}%</div>
+                        </div>
+                        <div>
+                            <div style="font-size: 14px; opacity: 0.9; margin-bottom: 5px;">总周期数</div>
+                            <div style="font-size: 28px; font-weight: bold;">${totalCycles}</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div style="margin-bottom: 25px;">
+                    <h4 style="margin: 0 0 15px 0; color: #333;">📊 分币种统计</h4>
+                    <div class="overview-stats">
+                        <div class="stat-card eth">
+                            <h4>ETH 投入</h4>
+                            <div class="stat-value">$${ethInitial.toLocaleString()}</div>
+                        </div>
+                        <div class="stat-card eth">
+                            <h4>ETH 收益</h4>
+                            <div class="stat-value">$${ethProfit.toFixed(2)}</div>
+                        </div>
+                        <div class="stat-card eth">
+                            <h4>ETH 收益率</h4>
+                            <div class="stat-value">${ethReturnRate}%</div>
+                        </div>
+                        <div class="stat-card eth">
+                            <h4>ETH 周期</h4>
+                            <div class="stat-value">${ethCycles}</div>
+                        </div>
+                    </div>
+
+                    <div class="overview-stats">
+                        <div class="stat-card btc">
+                            <h4>BTC 投入</h4>
+                            <div class="stat-value">$${btcInitial.toLocaleString()}</div>
+                        </div>
+                        <div class="stat-card btc">
+                            <h4>BTC 收益</h4>
+                            <div class="stat-value">$${btcProfit.toFixed(2)}</div>
+                        </div>
+                        <div class="stat-card btc">
+                            <h4>BTC 收益率</h4>
+                            <div class="stat-value">${btcReturnRate}%</div>
+                        </div>
+                        <div class="stat-card btc">
+                            <h4>BTC 周期</h4>
+                            <div class="stat-value">${btcCycles}</div>
+                        </div>
+                    </div>
+
+                    <div class="overview-stats">
+                        <div class="stat-card bnb">
+                            <h4>BNB 投入</h4>
+                            <div class="stat-value">$${bnbInitial.toLocaleString()}</div>
+                        </div>
+                        <div class="stat-card bnb">
+                            <h4>BNB 收益</h4>
+                            <div class="stat-value">$${bnbProfit.toFixed(2)}</div>
+                        </div>
+                        <div class="stat-card bnb">
+                            <h4>BNB 收益率</h4>
+                            <div class="stat-value">${bnbReturnRate}%</div>
+                        </div>
+                        <div class="stat-card bnb">
+                            <h4>BNB 周期</h4>
+                            <div class="stat-value">${bnbCycles}</div>
+                        </div>
+                    </div>
+                </div>
+
+                <h4 style="margin: 20px 0 15px 0; color: #333;">📋 产品详细列表</h4>
+                <table class="overview-table">
+                    <thead>
+                        <tr>
+                            <th>产品ID</th>
+                            <th>币种</th>
+                            <th>目标价</th>
+                            <th>初始投入</th>
+                            <th>总收益</th>
+                            <th>收益率</th>
+                            <th>周期数</th>
+                            <th>状态</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${Object.entries(data).map(([id, product]) => {
+                            const returnRate = product.initialAmount > 0 ? ((product.totalProfit / product.initialAmount) * 100).toFixed(2) : 0;
+                            const hasActiveCycles = product.cycles.length > 0;
+                            return `
+                                <tr>
+                                    <td><strong>${id}</strong></td>
+                                    <td><span class="coin-badge ${product.coin}">${product.coin}</span></td>
+                                    <td>$${product.targetPrice.toLocaleString()}</td>
+                                    <td>$${product.initialAmount.toLocaleString()}</td>
+                                    <td style="color: ${product.totalProfit >= 0 ? '#28a745' : '#dc3545'}; font-weight: bold;">$${product.totalProfit.toFixed(2)}</td>
+                                    <td style="color: ${returnRate >= 0 ? '#28a745' : '#dc3545'}; font-weight: bold;">${returnRate}%</td>
+                                    <td>${product.totalCycles}</td>
+                                    <td class="${hasActiveCycles ? 'status-active' : 'status-inactive'}">${hasActiveCycles ? '✅ 活跃' : '⏸️ 未开始'}</td>
+                                </tr>
+                            `;
+                        }).join('')}
+                    </tbody>
+                </table>
+            `;
+
+            document.getElementById('overviewModal').classList.add('active');
+        }
+
+        function closeOverviewModal() {
+            document.getElementById('overviewModal').classList.remove('active');
+        }
+
+        data = loadData();
+        renderProductList();
+    </script>
+</body>
+</html>
